@@ -53,37 +53,23 @@ def dag_longest_path(G, weight='weight', default_weight=1):
     path.reverse()
     return path
 
-def longest(G):
-    #print(G.nodes())
-    pathlist = dag_longest_path(G)
-    try:
-        print(len(pathlist) - pathlist.index(0))
-    except ValueError:
-        for dag in nx.weakly_connected_component_subgraphs(G):
-            if dag.has_node(0):
-                longest(dag)
-                break
-       
-    
-    # pathlist = dag_longest_path(G)
-    # if not 0 in pathlist:
-    #     for dag in nx.weakly_connected_component_subgraphs(G):
-    #         if dag.has_node(0):
-    #             pathlist = dag_longest_path(dag)
-    #             break
-    #
-    # for i in range(0,len(pathlist)):
-    #     if pathlist[i] == 0:
-    #         print(len(pathlist)-i)
-    #         break
-    # #print(len(pathlist) - pathlist.index(0))
 
-               
+def longest(G):
+    if len(G.nodes())==1:
+        print(0)
+    else:     
+        nodesFromSource = nx.descendants(G, 0)
+        for n in G.nodes():
+            if not n in nodesFromSource and n != 0:
+                G.remove_node(n)
+        pathlist = dag_longest_path(G)
+        print(len(pathlist)-1)  
+
 def main(input):
     G = nx.DiGraph()
     counter = 0
     number_of_nodes = 0
-    lines = input.split('\n')  
+    lines = input.split('\n')
     for line in lines:
         if counter == number_of_nodes:
             number_of_nodes = int(line)
@@ -91,16 +77,17 @@ def main(input):
                 longest(G)
                 G.clear()
             if number_of_nodes == 0:
-                break    
-            G.add_nodes_from(range(0,number_of_nodes))
-            counter = 0                          
+                break
+            G.add_node(0)
+            #G.add_nodes_from(range(0, number_of_nodes))
+            counter = 0
         else:
             nodes = line.split(' ')
             for n in nodes:
                 if n != '':
                     G.add_edge(counter, int(n))
             counter+=1
-        
-            
+
+
 if __name__ == '__main__':
     main(sys.stdin.read())
